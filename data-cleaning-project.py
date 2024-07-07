@@ -33,5 +33,3 @@ bis['year']=bis['Period'].dt.year
 bis['month']=bis['Period'].dt.month
 bis['day']=bis['Period'].dt.day
 
-bis.info()
-print(bis['Counterparty sector'])
