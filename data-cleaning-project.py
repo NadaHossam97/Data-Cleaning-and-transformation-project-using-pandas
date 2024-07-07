@@ -10,15 +10,28 @@ column_mapper = {'L_MEASURE:Measure':'Measure','L_POSITION:Balance sheet positio
 bis.rename(columns=column_mapper, inplace=True)
 
 #Rename frequent values to a more convenient name
-bis=bis.replace(['F:FX and break adjusted change (BIS calculated)','G:Annual growth (BIS calculated)','S:Amounts outstanding / Stocks'],['FX','Annual growth','outstanding/Stocks'])
-bis=bis.replace(['C:Total claims','L:Total liabilities'],['claims','liabilities'])
-bis=bis.replace(['A:All currencies (=D+F+U)','D:Domestic currency (ie currency of bank location country)','F:Foreign currency (ie currencies foreign to bank location country)'],['All Curr','LCY','FCY'])
-bis[['code','Parent country']]=bis['Parent country'].str.split(pat=':',expand=True)
+replace_values = {
+    'F:FX and break adjusted change (BIS calculated)': 'FX',
+    'G:Annual growth (BIS calculated)': 'Annual growth',
+    'S:Amounts outstanding / Stocks': 'outstanding/Stocks',
+    'C:Total claims': 'claims',
+    'L:Total liabilities': 'liabilities',
+    'A:All currencies (=D+F+U)': 'All Curr',
+    'D:Domestic currency (ie currency of bank location country)': 'LCY',
+    'F:Foreign currency (ie currencies foreign to bank location country)': 'FCY'
+}
+bis = bis.replace(replace_values)
+bis[['Country Code','Parent country']]=bis['Parent country'].str.split(pat=':',expand=True)
 bis[['part1','Position type']]=bis['Position type'].str.split(pat=':',expand=True)
-bis = bis.drop(columns=['code','part1'])
+bis[['part2','Counterparty sector']]=bis['Counterparty sector'].str.split(pat=':',expand=True)
+
+bis = bis.drop(columns=['part1','part2'])
 
 #Change datatype to datetime
 bis['Period']=pd.to_datetime(bis['Period'])
 bis['year']=bis['Period'].dt.year
 bis['month']=bis['Period'].dt.month
 bis['day']=bis['Period'].dt.day
+
+bis.info()
+print(bis['Counterparty sector'])
